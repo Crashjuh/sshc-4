@@ -1,0 +1,37 @@
+#! /bin/bash
+# Programming and idea by : E2MA3N [Iman Homayouni]
+# Email : e2ma3n@Gmail.com
+# Website : http://OSLearn.ir
+# License : GPL v3.0
+# sshc v1.0 [SSH Management Console]
+#--------------------------------------------------------#
+if [ "`whoami`" != "root" ]; then
+        echo -e '[-] Please use root user or sudo'
+        exit 1
+fi
+
+reset ; echo '[+] ------------------------------------------------------------------- [+]'
+echo -e "[+] Programming and idea by : \e[1mE2MA3N [Iman Homayouni]\e[0m"
+echo '[+] License : GPL v3.0'
+echo -e '[+] sshc v1.0 \n'
+
+var0=`cat /etc/sshc/sshc.database | wc -l`
+var0=`expr $var0 - 11`
+
+for (( i=1 ; i <= $var0 ; i++ )) ; do
+ping -c 1 `cat /etc/sshc/sshc.database | tail -n $i | head -n 1 | cut -d " " -f 2` &> /dev/null
+if [ "$?" = "0" ] ; then
+	echo -ne "\e[0m $i) [Seems  UP ] \e[92m" ; cat /etc/sshc/sshc.database | tail -n $i | head -n 1 | cut -d " " -f 1,2 | tr " " "@"
+else
+	echo -ne "\e[0m $i) [Seems Down] \e[91m" ; cat /etc/sshc/sshc.database | tail -n $i | head -n 1 | cut -d " " -f 1,2 | tr " " "@"
+fi
+done
+echo -en '\e[0m\n[+] Select your servers: ' ; read var1
+
+username=`cat /etc/sshc/sshc.database | tail -n $var1 | head -n 1 | cut -d " " -f 1`
+ip=`cat /etc/sshc/sshc.database | tail -n $var1 | head -n 1 | cut -d " " -f 2`
+port=`cat /etc/sshc/sshc.database | tail -n $var1 | head -n 1 | cut -d " " -f 3`
+password=`cat /etc/sshc/sshc.database | tail -n $var1 | head -n 1 | cut -d " " -f 4`
+
+echo '[+] ------------------------------------------------------------------- [+]'
+sshpass -p "$password" ssh -o StrictHostKeyChecking=no -l $username $ip -p $port
